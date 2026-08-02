@@ -16,24 +16,24 @@ const items = computed(() => [
 
 <template>
   <nav class="fixed inset-x-0 bottom-0 z-30 safe-bottom safe-x border-t border-slate-200/70 dark:border-white/10 glass sm:hidden">
-    <div class="flex h-16 items-center justify-around">
+    <div class="flex h-14 items-center justify-around">
       <RouterLink
         v-for="item in items"
         :key="item.name"
         :to="item.to"
-        class="touch-target flex flex-1 flex-col items-center gap-1 py-1.5 text-[11px] font-medium transition-colors"
+        class="touch-target flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors"
         :class="route.name === item.name ? 'text-accent-500' : 'text-slate-400'"
       >
-        <component :is="item.icon" :size="20" />
+        <component :is="item.icon" :size="19" />
         {{ item.label }}
       </RouterLink>
       <RouterLink
         v-if="auth.isAdmin"
         to="/admin"
-        class="touch-target flex flex-1 flex-col items-center gap-1 py-1.5 text-[11px] font-medium transition-colors"
+        class="touch-target flex flex-1 flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors"
         :class="route.name === 'admin' ? 'text-accent-500' : 'text-slate-400'"
       >
-        <ShieldCheck :size="20" />
+        <ShieldCheck :size="19" />
         Admin
       </RouterLink>
     </div>

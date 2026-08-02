@@ -39,10 +39,12 @@ watch(
 
 function onDragStart(): void {
   dragging = true;
+  board.dragging = true;
 }
 
 function onDragEnd(): void {
   dragging = false;
+  board.dragging = false;
   localTasks.value = board.tasksByColumn(props.column._id);
 }
 
@@ -128,6 +130,10 @@ const countLabel = computed(() => `${taskCount.value} tasks`);
           :delay="150"
           :delay-on-touch-only="true"
           :touch-start-threshold="5"
+          :scroll="true"
+          :bubble-scroll="true"
+          :scroll-sensitivity="80"
+          :scroll-speed="15"
           class="flex min-h-full flex-col gap-3"
           @start="onDragStart"
           @end="onDragEnd"

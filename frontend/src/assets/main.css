@@ -41,6 +41,17 @@ a,
 [role='button'],
 .touch-target {
   touch-action: manipulation;
+  outline: none;
+}
+
+/* Keep a real focus ring for keyboard/screen-reader navigation, but not for a mouse click or a
+   mobile tap - :focus-visible already draws this distinction natively in modern browsers. */
+button:focus-visible,
+a:focus-visible,
+[role='button']:focus-visible,
+.touch-target:focus-visible {
+  outline: 2px solid theme('colors.accent.500');
+  outline-offset: 2px;
 }
 
 #app {
@@ -60,6 +71,16 @@ a,
 
 .glass {
   @apply bg-white/70 dark:bg-white/[0.06] backdrop-blur-glass border border-white/40 dark:border-white/10 shadow-glass;
+}
+
+/* SortableJS moves the picked-up/dragged card via its own inline `transform` on every pointer
+   move. A CSS transition on that same property (e.g. Tailwind's transition-all + hover:-translate-y)
+   fights it, turning smooth 1:1 finger tracking into a laggy, shaky trail - so kill transitions
+   outright while a card is in one of Sortable's drag states. */
+.sortable-chosen,
+.sortable-drag,
+.sortable-fallback {
+  transition: none !important;
 }
 
 ::-webkit-scrollbar {

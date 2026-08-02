@@ -5,6 +5,7 @@ import { Sun, Moon, LayoutGrid, Wallet, ShoppingBag, ShieldCheck, LogOut, Check 
 import { useAuthStore } from '@/stores/auth';
 import { useUiStore } from '@/stores/ui';
 import { useShoppingStore } from '@/stores/shopping';
+import { useRealtimeStore } from '@/stores/realtime';
 import Avatar from '@/components/common/Avatar.vue';
 import NotificationBell from './NotificationBell.vue';
 import ProfileModal from './ProfileModal.vue';
@@ -13,6 +14,7 @@ import { toast } from '@/lib/toast';
 const auth = useAuthStore();
 const ui = useUiStore();
 const shopping = useShoppingStore();
+const realtime = useRealtimeStore();
 const route = useRoute();
 const router = useRouter();
 const profileOpen = ref(false);
@@ -75,7 +77,7 @@ async function onLogout(): Promise<void> {
         </button>
         <NotificationBell />
         <button type="button" class="touch-target flex items-center gap-2.5 rounded-xl border border-slate-200/70 py-1 pl-1 pr-1 transition-colors hover:bg-slate-100 dark:border-white/10 dark:hover:bg-white/10 sm:pr-3.5" @click="profileOpen = true">
-          <Avatar :src="auth.user?.avatarUrl" :name="auth.user?.username ?? '?'" :size="32" />
+          <Avatar :src="auth.user?.avatarUrl" :name="auth.user?.username ?? '?'" :size="32" :online="auth.user ? realtime.onlineUserIds.includes(auth.user.id) : undefined" />
           <span class="hidden leading-none sm:block">
             <span class="block text-sm font-semibold text-slate-800 dark:text-slate-100">{{ auth.user?.username }}</span>
             <span class="mt-0.5 block text-[10px] font-medium uppercase tracking-[0.14em] text-slate-400">{{ roleLabel }}</span>
