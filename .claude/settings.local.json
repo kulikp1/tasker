@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(dataviz)",
+      "Skill(dataviz:*)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(brew list *)",
+      "Bash(brew services *)",
+      "Read(//opt/homebrew/opt/**)",
+      "Read(//usr/local/**)",
+      "Bash(node /private/tmp/claude-501/-Users-kulikpavel-Documents-GitHub-tasker/b7557b7e-c920-4ed1-a770-1f62159fc82d/scratchpad/start-mongo.js)",
+      "Bash(echo \"pid $!\")",
+      "Read(//tmp/**)",
+      "Bash(cp /private/tmp/claude-501/-Users-kulikpavel-Documents-GitHub-tasker/b7557b7e-c920-4ed1-a770-1f62159fc82d/scratchpad/start-mongo.js /Users/kulikpavel/Documents/GitHub/tasker/backend/tmp-start-mongo.js *)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
+    ]
+  }
+}
