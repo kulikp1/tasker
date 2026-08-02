@@ -26,13 +26,18 @@ const deadlineLabel = computed(() => {
 
 <template>
   <div
-    class="group relative cursor-grab overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing dark:border-white/10 dark:bg-white/[0.05]"
+    class="sortable-drag-handle group relative cursor-grab overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing dark:border-white/10 dark:bg-white/[0.05]"
     @click="$emit('click')"
   >
     <span v-if="task.tag" class="absolute inset-y-0 left-0 w-1" :style="{ backgroundColor: accent }" />
 
     <div class="p-4 pl-5">
-      <div v-if="task.imageUrl" v-viewer class="mb-3" @click.stop>
+      <div
+        v-if="task.imageUrl"
+        v-viewer="{ toolbar: false, navbar: false, title: false, tooltip: false, movable: true, zoomable: true, rotatable: false, scalable: false, button: true }"
+        class="mb-3"
+        @click.stop
+      >
         <img :src="task.imageUrl" alt="" class="h-28 w-full cursor-zoom-in rounded-xl object-cover" />
       </div>
 

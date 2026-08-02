@@ -41,15 +41,27 @@ a,
 [role='button'],
 .touch-target {
   touch-action: manipulation;
+}
+
+button,
+a,
+[role='button'],
+.touch-target,
+input,
+select,
+textarea {
   outline: none;
 }
 
-/* Keep a real focus ring for keyboard/screen-reader navigation, but not for a mouse click or a
-   mobile tap - :focus-visible already draws this distinction natively in modern browsers. */
+/* Keep a real focus ring for keyboard/screen-reader navigation, but not for a mouse click, a
+   mobile tap, or typing into a field - :focus-visible already draws that distinction natively. */
 button:focus-visible,
 a:focus-visible,
 [role='button']:focus-visible,
-.touch-target:focus-visible {
+.touch-target:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 2px solid theme('colors.accent.500');
   outline-offset: 2px;
 }
@@ -81,6 +93,15 @@ a:focus-visible,
 .sortable-drag,
 .sortable-fallback {
   transition: none !important;
+}
+
+/* Drag needs a brief press-and-hold on touch (see the `delay` option on <draggable>) before it
+   activates - without this, that same hold is indistinguishable from a long-press to select text
+   or open iOS's copy/look-up callout, so the browser wins the gesture instead of Sortable. */
+.sortable-drag-handle {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
