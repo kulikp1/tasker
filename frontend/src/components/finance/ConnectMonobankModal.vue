@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Loader2, Link2 } from 'lucide-vue-next';
+import { Link2 } from 'lucide-vue-next';
+import Spinner from '@/components/common/Spinner.vue';
 import Modal from '@/components/common/Modal.vue';
 import { useFinanceStore } from '@/stores/finance';
 import { toast } from '@/lib/toast';
@@ -44,7 +45,7 @@ async function connect(): Promise<void> {
     />
     <template #footer>
       <button type="button" class="touch-target flex items-center gap-1.5 rounded-xl bg-accent-500 px-4 py-2 text-sm font-medium text-white hover:bg-accent-600 disabled:opacity-50" :disabled="connecting" @click="connect">
-        <Loader2 v-if="connecting" :size="16" class="animate-spin" />
+        <Spinner v-if="connecting" :size="16" />
         <Link2 v-else :size="16" />
         Підключити
       </button>

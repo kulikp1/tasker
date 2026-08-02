@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Plus } from 'lucide-vue-next';
 import StickerNote from '@/components/shopping/StickerNote.vue';
+import Spinner from '@/components/common/Spinner.vue';
 import { useShoppingStore } from '@/stores/shopping';
 import { useRealtimeStore } from '@/stores/realtime';
 import { useConfirm } from '@/composables/useConfirm';
@@ -144,7 +145,8 @@ async function onRemove(id: string, title: string): Promise<void> {
           />
         </div>
         <button type="button" class="touch-target mt-auto flex items-center justify-center gap-1.5 rounded-xl bg-accent-500 py-3 text-sm font-semibold text-white shadow-glow hover:bg-accent-600 disabled:opacity-50" :disabled="creating" @click="createList">
-          <Plus :size="16" /> Створити список
+          <Spinner v-if="creating" :size="16" />
+          <Plus v-else :size="16" /> Створити список
         </button>
       </div>
     </div>

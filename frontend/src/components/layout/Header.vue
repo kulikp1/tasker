@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { Sun, Moon, LayoutGrid, Wallet, ShoppingBag, ShieldCheck, LogOut, Check } from 'lucide-vue-next';
 import { useAuthStore } from '@/stores/auth';
 import { useUiStore } from '@/stores/ui';
@@ -14,6 +14,7 @@ const auth = useAuthStore();
 const ui = useUiStore();
 const shopping = useShoppingStore();
 const route = useRoute();
+const router = useRouter();
 const profileOpen = ref(false);
 
 const shoppingBadge = computed(() => shopping.activeLists.length);
@@ -27,6 +28,7 @@ const navItems = computed(() => [
 
 async function onLogout(): Promise<void> {
   await auth.logout();
+  await router.push({ name: 'login' });
   toast.info('Ви вийшли з акаунту');
 }
 </script>

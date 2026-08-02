@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { Trash2, Loader2 } from 'lucide-vue-next';
+import { Trash2 } from 'lucide-vue-next';
+import Spinner from '@/components/common/Spinner.vue';
 import Modal from '@/components/common/Modal.vue';
 import DatePicker from '@/components/common/DatePicker.vue';
 import TimePicker from '@/components/common/TimePicker.vue';
@@ -175,10 +176,11 @@ async function remove(): Promise<void> {
 
     <template #footer>
       <button v-if="!isNew && isCreator" type="button" class="touch-target mr-auto flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-500/10 disabled:opacity-50" :disabled="deleting" @click="remove">
-        <Trash2 :size="16" /> Видалити
+        <Spinner v-if="deleting" :size="16" />
+        <Trash2 v-else :size="16" /> Видалити
       </button>
       <button v-if="!readOnly" type="button" class="touch-target rounded-xl bg-accent-500 px-4 py-2 text-sm font-medium text-white hover:bg-accent-600 disabled:opacity-50" :disabled="saving" @click="save">
-        <Loader2 v-if="saving" :size="16" class="mr-1.5 inline animate-spin" />
+        <Spinner v-if="saving" :size="16" class="mr-1.5 inline-block" />
         Зберегти
       </button>
     </template>

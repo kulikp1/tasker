@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { RefreshCw, Link2, Loader2 } from 'lucide-vue-next';
+import { RefreshCw, Link2 } from 'lucide-vue-next';
+import Spinner from '@/components/common/Spinner.vue';
 import StatCard from '@/components/finance/StatCard.vue';
 import CategoryDonutChart from '@/components/finance/CategoryDonutChart.vue';
 import TrendChart from '@/components/finance/TrendChart.vue';
@@ -54,7 +55,7 @@ const lastSyncLabel = computed(() => (finance.lastSyncedAt ? new Date(finance.la
       <h1 class="font-display text-5xl font-bold leading-none text-slate-900 dark:text-white">Фінанси</h1>
       <div class="flex items-center gap-2">
         <button v-if="finance.accounts.length > 0" type="button" class="touch-target flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-50" :disabled="syncing" @click="onSync">
-          <Loader2 v-if="syncing" :size="14" class="animate-spin" />
+          <Spinner v-if="syncing" :size="14" />
           <RefreshCw v-else :size="14" />
           Синхронізувати
         </button>

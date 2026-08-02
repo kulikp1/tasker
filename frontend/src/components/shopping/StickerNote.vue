@@ -22,7 +22,6 @@ const c = computed(() => noteColor(props.list.color));
 const purchased = computed(() => props.list.items.filter((i) => i.isPurchased).length);
 const total = computed(() => props.list.items.length);
 const progress = computed(() => (total.value === 0 ? 0 : Math.round((purchased.value / total.value) * 100)));
-const number = computed(() => String(props.index + 1).padStart(3, '0'));
 const author = computed(() => people.byId(props.list.createdBy)?.username ?? '—');
 // Deterministic tilt per note so the board looks pinned, never re-rolled on render.
 const tilt = computed(() => {
@@ -58,8 +57,7 @@ function submitItem(): void {
       <button type="button" class="touch-target flex h-7 w-7 items-center justify-center rounded-full bg-black/5 text-red-600/80 hover:bg-red-500/20" title="Видалити" @click="emit('remove')"><Trash2 :size="14" /></button>
     </div>
 
-    <div class="flex items-center justify-between gap-2 pr-20 font-mono text-[11px] opacity-60">
-      <span>№ {{ number }}</span>
+    <div class="flex items-center justify-end pr-20 font-mono text-[11px] opacity-60">
       <span class="text-right">{{ createdLabel(list.createdAt) }}</span>
     </div>
 

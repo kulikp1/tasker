@@ -74,11 +74,11 @@ onMounted(async () => {
         <p class="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">Home Team</p>
       </div>
       <div class="flex flex-col items-center gap-3">
-        <div ref="overlayWrap" class="relative w-full">
+        <div ref="overlayWrap" class="group relative w-full">
           <button
             type="button"
             tabindex="-1"
-            class="touch-target pointer-events-none flex w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 shadow-sm transition-shadow dark:border-white/10"
+            class="touch-target pointer-events-none flex w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all group-hover:border-accent-300 group-hover:shadow-md dark:border-white/10 dark:bg-white/[0.06] dark:text-white dark:group-hover:border-white/20 dark:group-hover:bg-white/10"
           >
             <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
               <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>

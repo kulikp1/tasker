@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ImagePlus, X, Loader2 } from 'lucide-vue-next';
+import { ImagePlus, X } from 'lucide-vue-next';
+import Spinner from './Spinner.vue';
 import { uploadImage } from '@/api/uploads';
 import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
@@ -50,7 +51,7 @@ function remove(): void {
       :disabled="uploading"
       @click="fileInput?.click()"
     >
-      <Loader2 v-if="uploading" :size="22" class="animate-spin" />
+      <Spinner v-if="uploading" :size="22" />
       <ImagePlus v-else :size="22" />
     </button>
   </div>

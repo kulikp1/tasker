@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { LogOut, UserPlus, Copy } from 'lucide-vue-next';
 import Modal from '@/components/common/Modal.vue';
 import ImageUpload from '@/components/common/ImageUpload.vue';
+import Spinner from '@/components/common/Spinner.vue';
 import { useAuthStore } from '@/stores/auth';
 import { inviteUser } from '@/api/users';
 import { toast } from '@/lib/toast';
@@ -13,6 +15,7 @@ const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits<{ 'update:modelValue': [boolean] }>();
 
 const auth = useAuthStore();
+const router = useRouter();
 const username = ref(auth.user?.username ?? '');
 const avatarUrl = ref<string | null>(auth.user?.avatarUrl ?? null);
 const savingProfile = ref(false);
@@ -66,6 +69,7 @@ function resetInvite(): void {
 async function onLogout(): Promise<void> {
   await auth.logout();
   emit('update:modelValue', false);
+  await router.push({ name: 'login' });
   toast.info('Ви вийшли з акаунту');
 }
 </script>
@@ -83,7 +87,8 @@ async function onLogout(): Promise<void> {
           <label class="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">Пошта (Google)</label>
           <p class="w-full rounded-xl border border-slate-200 bg-black/[0.03] px-3.5 py-2.5 text-sm text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">{{ auth.user?.email }}</p>
         </div>
-        <button type="button" class="touch-target w-full rounded-xl bg-accent-500 py-2.5 text-sm font-medium text-white hover:bg-accent-600 disabled:opacity-50" :disabled="savingProfile" @click="saveProfile">
+        <button type="button" class="touch-target flex w-full items-center justify-center gap-1.5 rounded-xl bg-accent-500 py-2.5 text-sm font-medium text-white hover:bg-accent-600 disabled:opacity-50" :disabled="savingProfile" @click="saveProfile">
+          <Spinner v-if="savingProfile" :size="16" />
           Зберегти профіль
         </button>
       </section>
@@ -97,7 +102,8 @@ async function onLogout(): Promise<void> {
             <option value="admin">admin</option>
           </select>
           <button type="button" class="touch-target flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-800 dark:bg-white/10 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50" :disabled="inviting" @click="sendInvite">
-            <UserPlus :size="16" /> Запросити
+            <Spinner v-if="inviting" :size="16" />
+            <UserPlus v-else :size="16" /> Запросити
           </button>
         </div>
         <div v-else class="flex flex-col gap-2.5">

@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Copy, UserPlus } from 'lucide-vue-next';
 import Modal from '@/components/common/Modal.vue';
+import Spinner from '@/components/common/Spinner.vue';
 import { useAdminStore } from '@/stores/admin';
 import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
@@ -55,7 +56,8 @@ function close(): void {
         <option value="admin">admin</option>
       </select>
       <button type="button" class="touch-target flex items-center justify-center gap-1.5 rounded-xl bg-accent-500 py-2.5 text-sm font-medium text-white hover:bg-accent-600 disabled:opacity-50" :disabled="creating" @click="create">
-        <UserPlus :size="16" /> Запросити
+        <Spinner v-if="creating" :size="16" />
+        <UserPlus v-else :size="16" /> Запросити
       </button>
     </div>
     <div v-else class="flex flex-col gap-3">
