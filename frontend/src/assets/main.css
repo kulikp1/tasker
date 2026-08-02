@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  overscroll-behavior-y: contain;
+}
+
+body {
+  @apply bg-surface-light text-slate-900 antialiased;
+  min-height: 100dvh;
+}
+
+html.dark body {
+  @apply bg-surface-dark text-slate-100;
+}
+
+/* iOS Safari zooms the page on focus if a form field renders below 16px - this must win over any
+   Tailwind text-size utility applied to a specific input, so it's intentionally !important. */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+button,
+a,
+[role='button'],
+.touch-target {
+  touch-action: manipulation;
+}
+
+#app {
+  min-height: 100dvh;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.glass {
+  @apply bg-white/70 dark:bg-white/[0.06] backdrop-blur-glass border border-white/40 dark:border-white/10 shadow-glass;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.35);
+  border-radius: 999px;
+}
+
+/* vue-sonner's own bottom-offset rule (`max(var(--offset), env(safe-area-inset-bottom))`) resolves
+   to a stale ~20px in this app regardless of the offset prop passed to <Toaster> - overriding here
+   with a real selector (beats their :where()-wrapped rules) so toasts clear the mobile bottom nav. */
+[data-sonner-toaster][data-y-position='bottom'] {
+  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 1rem) !important;
+}
+[data-sonner-toaster][data-y-position='top'] {
+  top: calc(env(safe-area-inset-top) + 1rem) !important;
+}
