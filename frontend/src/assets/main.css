@@ -97,11 +97,16 @@ textarea:focus-visible {
 
 /* Drag needs a brief press-and-hold on touch (see the `delay` option on <draggable>) before it
    activates - without this, that same hold is indistinguishable from a long-press to select text
-   or open iOS's copy/look-up callout, so the browser wins the gesture instead of Sortable. */
+   or open iOS's copy/look-up callout, so the browser wins the gesture instead of Sortable.
+   touch-action: none is required too - otherwise the browser starts its own native scroll on the
+   very first touchmove (before the delay elapses and Sortable's own preventDefault kicks in),
+   which cancels the touch sequence outright and the drag never gets a chance to start. Scrolling a
+   column now has to happen from the gaps/padding around cards rather than from on top of one. */
 .sortable-drag-handle {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  touch-action: none;
 }
 
 ::-webkit-scrollbar {

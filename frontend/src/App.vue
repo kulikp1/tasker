@@ -54,7 +54,7 @@ watch(
 <template>
   <div class="flex h-dvh flex-col overflow-hidden">
     <Header v-if="auth.isAuthenticated && route.name !== 'login'" />
-    <main class="min-h-0 flex-1 overflow-y-auto pb-20 sm:pb-6">
+    <main class="min-h-0 flex-1 overflow-y-auto pb-6">
       <RouterView />
     </main>
     <BottomNav v-if="auth.isAuthenticated && route.name !== 'login'" />
