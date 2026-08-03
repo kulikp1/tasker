@@ -5,7 +5,7 @@ import { confirmState, resolveConfirm } from '@/composables/useConfirm';
 </script>
 
 <template>
-  <Modal :model-value="confirmState.visible" size="sm" persistent @update:model-value="(v) => !v && resolveConfirm(false)">
+  <Modal :model-value="confirmState.visible" size="sm" persistent elevated @update:model-value="(v) => !v && resolveConfirm(false)">
     <div class="flex flex-col items-center gap-4 py-1 text-center">
       <span
         class="relative flex h-16 w-16 items-center justify-center rounded-2xl"

@@ -13,6 +13,27 @@ defineEmits<{ click: [] }>();
 const people = usePeopleStore();
 const realtime = useRealtimeStore();
 
+let baseZoomRatio = 1;
+const imageViewerOptions = {
+  toolbar: false,
+  navbar: false,
+  title: false,
+  tooltip: false,
+  movable: true,
+  zoomable: true,
+  rotatable: false,
+  scalable: false,
+  button: true,
+  // Viewer.js opens at whatever ratio fits the screen - remember that as the floor so
+  // pinch-to-zoom-out can only return to it, never shrink the photo smaller than that.
+  ready(this: any) {
+    baseZoomRatio = this.imageData.ratio;
+  },
+  zoom(e: CustomEvent<{ ratio: number }>) {
+    if (e.detail.ratio < baseZoomRatio) e.preventDefault();
+  },
+};
+
 const creator = computed(() => people.byId(props.task.createdBy));
 const assignee = computed(() => people.byId(props.task.assigneeId));
 const accent = computed(() => tagHex(props.task.tagColor));
@@ -34,7 +55,7 @@ const deadlineLabel = computed(() => {
     <div class="p-4 pl-5">
       <div
         v-if="task.imageUrl"
-        v-viewer="{ toolbar: false, navbar: false, title: false, tooltip: false, movable: true, zoomable: true, rotatable: false, scalable: false, button: true }"
+        v-viewer="imageViewerOptions"
         class="mb-3"
         @click.stop
       >

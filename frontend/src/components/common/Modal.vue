@@ -7,6 +7,7 @@ const props = defineProps<{
   title?: string;
   persistent?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  elevated?: boolean;
 }>();
 
 const emit = defineEmits<{ 'update:modelValue': [boolean] }>();
@@ -39,7 +40,7 @@ const sizeClass = {
 <template>
   <Teleport to="body">
     <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/40 px-2 py-4 backdrop-blur-sm safe-x sm:p-6" @mousedown.self="close">
+      <div v-if="modelValue" class="fixed inset-0 flex items-center justify-center overflow-y-auto bg-slate-900/40 px-2 py-4 backdrop-blur-sm safe-x sm:p-6" :class="elevated ? 'z-[60]' : 'z-50'" @mousedown.self="close">
         <Transition appear enter-active-class="animate-pop-in">
           <div
             class="my-auto flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-white/10 dark:bg-[#15151d]"

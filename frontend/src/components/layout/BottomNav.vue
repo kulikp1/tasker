@@ -15,7 +15,7 @@ const items = computed(() => [
 </script>
 
 <template>
-  <nav class="fixed inset-x-0 bottom-0 z-30 safe-bottom safe-x border-t border-slate-200/70 dark:border-white/10 glass sm:hidden">
+  <nav class="fixed inset-x-0 bottom-0 z-30 safe-bottom safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden">
     <div class="flex h-14 items-center justify-around">
       <RouterLink
         v-for="item in items"

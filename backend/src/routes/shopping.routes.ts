@@ -118,6 +118,9 @@ shoppingRouter.post('/:id/items', async (req, res, next) => {
       return;
     }
     list.items.push({ title: data.title, quantity: data.quantity || undefined, isPurchased: false });
+    // A new item is never pre-purchased, so a previously auto-archived ("everything bought")
+    // list must come back to Active - otherwise the item is saved but invisible there.
+    list.isArchived = false;
     await list.save();
     await writeAuditLog({ workspaceId, userId: req.user!.sub, username: req.user!.username, action: 'create_shopping_item', targetType: 'shoppingList', targetId: list._id, meta: { title: data.title } });
     notifyShoppingUpdated(req);
