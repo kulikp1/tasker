@@ -3,12 +3,14 @@ import { computed, ref } from 'vue';
 import { Check, Plus, Archive, ArchiveRestore, Trash2, X } from 'lucide-vue-next';
 import { noteColor } from '@/lib/noteColors';
 import { usePeopleStore } from '@/stores/people';
+import Spinner from '@/components/common/Spinner.vue';
+import { toast } from '@/lib/toast';
+import { apiErrorMessage } from '@/api/client';
 import type { ShoppingList } from '@/api/types';
 
-const props = defineProps<{ list: ShoppingList; index: number; archived?: boolean }>();
+const props = defineProps<{ list: ShoppingList; index: number; archived?: boolean; addItem?: (title: string) => Promise<void> }>();
 const emit = defineEmits<{
   toggleItem: [itemId: string, value: boolean];
-  addItem: [title: string];
   removeItem: [itemId: string];
   archive: [];
   unarchive: [];
@@ -35,11 +37,23 @@ function createdLabel(iso: string): string {
   return new Date(iso).toLocaleString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-function submitItem(): void {
+const submitting = ref(false);
+
+async function submitItem(): Promise<void> {
   const t = newItem.value.trim();
-  if (!t) return;
-  emit('addItem', t);
-  newItem.value = '';
+  if (!t || submitting.value) return;
+  if (!props.addItem) return;
+  submitting.value = true;
+  try {
+    await props.addItem(t);
+    // Only clear once the server actually confirmed it - otherwise a failed request looked
+    // like the item silently vanished, since the input was already emptied either way.
+    newItem.value = '';
+  } catch (err) {
+    toast.error(apiErrorMessage(err, 'Не вдалося додати покупку'));
+  } finally {
+    submitting.value = false;
+  }
 }
 </script>
 
@@ -97,11 +111,15 @@ function submitItem(): void {
           v-model="newItem"
           type="text"
           placeholder="ще покупка…"
-          class="min-w-0 flex-1 bg-transparent font-display text-xl leading-tight placeholder:opacity-40 focus:outline-none"
+          :disabled="submitting"
+          class="min-w-0 flex-1 bg-transparent font-display text-xl leading-tight placeholder:opacity-40 focus:outline-none disabled:opacity-50"
           :style="{ color: c.ink }"
           @keyup.enter="submitItem"
         />
-        <button type="button" class="touch-target flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-black/10 hover:bg-black/20" @click="submitItem"><Plus :size="15" /></button>
+        <button type="button" class="touch-target flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-black/10 hover:bg-black/20 disabled:opacity-50" :disabled="submitting" @click="submitItem">
+          <Spinner v-if="submitting" :size="14" />
+          <Plus v-else :size="15" />
+        </button>
       </li>
     </ul>
 

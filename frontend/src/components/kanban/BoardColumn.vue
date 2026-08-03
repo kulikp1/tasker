@@ -128,6 +128,8 @@ const countLabel = computed(() => `${taskCount.value} tasks`);
           animation="200"
           ghost-class="opacity-40"
           chosen-class="ring-2 ring-accent-400 shadow-xl"
+          :force-fallback="true"
+          :fallback-tolerance="3"
           :delay="120"
           :delay-on-touch-only="true"
           :touch-start-threshold="5"

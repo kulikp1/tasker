@@ -55,12 +55,8 @@ async function onToggle(listId: string, itemId: string, value: boolean): Promise
   }
 }
 async function onAddItem(listId: string, title: string): Promise<void> {
-  try {
-    await shopping.addItem(listId, title);
-    toast.success('Покупку додано');
-  } catch (err) {
-    toast.error(apiErrorMessage(err));
-  }
+  await shopping.addItem(listId, title);
+  toast.success('Покупку додано');
 }
 async function onRemoveItem(listId: string, itemId: string): Promise<void> {
   try {
@@ -115,8 +111,8 @@ async function onRemove(id: string, title: string): Promise<void> {
         :key="list._id"
         :list="list"
         :index="i"
+        :add-item="(t) => onAddItem(list._id, t)"
         @toggle-item="(id, v) => onToggle(list._id, id, v)"
-        @add-item="(t) => onAddItem(list._id, t)"
         @remove-item="(id) => onRemoveItem(list._id, id)"
         @archive="onArchive(list._id)"
         @remove="onRemove(list._id, list.title)"
