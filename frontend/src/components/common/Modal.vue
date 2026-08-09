@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { watch } from 'vue';
+import { onUnmounted, watch } from 'vue';
 import { X } from 'lucide-vue-next';
+import { lockScroll, unlockScroll } from '@/lib/scrollLock';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -21,14 +22,26 @@ function onKeydown(e: KeyboardEvent): void {
   if (e.key === 'Escape') close();
 }
 
+// Plain `overflow: hidden` on <html> leaves the page scrolled where it was, so on iOS a
+// `position: fixed` modal opened mid-scroll renders offset by that scroll distance (looks
+// like it "jumps" to the wrong spot). Freezing <body> in place with a negative top instead
+// keeps the fixed modal correctly aligned to the viewport, then restores the scroll on close.
 watch(
   () => props.modelValue,
   (open) => {
-    document.documentElement.style.overflow = open ? 'hidden' : '';
-    if (open) window.addEventListener('keydown', onKeydown);
-    else window.removeEventListener('keydown', onKeydown);
+    if (open) {
+      lockScroll();
+      window.addEventListener('keydown', onKeydown);
+    } else {
+      unlockScroll();
+      window.removeEventListener('keydown', onKeydown);
+    }
   }
 );
+
+onUnmounted(() => {
+  if (props.modelValue) unlockScroll();
+});
 
 const sizeClass = {
   sm: 'max-w-sm lg:max-w-md',
@@ -43,7 +56,7 @@ const sizeClass = {
       <div v-if="modelValue" class="fixed inset-0 flex items-center justify-center overflow-y-auto bg-slate-900/40 px-2 py-4 backdrop-blur-sm safe-x sm:p-6" :class="elevated ? 'z-[60]' : 'z-50'" @mousedown.self="close">
         <Transition appear enter-active-class="animate-pop-in">
           <div
-            class="my-auto flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-white/10 dark:bg-[#15151d]"
+            class="my-auto flex max-h-[calc(100svh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-white/10 dark:bg-[#15151d]"
             :class="sizeClass[size ?? 'md']"
             @mousedown.stop
           >

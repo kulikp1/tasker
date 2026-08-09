@@ -21,7 +21,7 @@ body {
 
 body {
   @apply bg-surface-light text-slate-900 antialiased;
-  min-height: 100dvh;
+  min-height: 100svh;
 }
 
 html.dark body {
@@ -67,7 +67,7 @@ textarea:focus-visible {
 }
 
 #app {
-  min-height: 100dvh;
+  min-height: 100svh;
 }
 
 .safe-top {
@@ -95,18 +95,31 @@ textarea:focus-visible {
   transition: none !important;
 }
 
-/* Drag needs a brief press-and-hold on touch (see the `delay` option on <draggable>) before it
-   activates - without this, that same hold is indistinguishable from a long-press to select text
-   or open iOS's copy/look-up callout, so the browser wins the gesture instead of Sortable.
-   touch-action: none is required too - otherwise the browser starts its own native scroll on the
-   very first touchmove (before the delay elapses and Sortable's own preventDefault kicks in),
-   which cancels the touch sequence outright and the drag never gets a chance to start. Scrolling a
-   column now has to happen from the gaps/padding around cards rather than from on top of one. */
-.sortable-drag-handle {
+/* iOS Safari has long-standing, still-open bugs around SortableJS's forceFallback touch path
+   when the whole card is the drag surface (native scroll/selection gestures win the race against
+   the JS-driven drag depending on iOS version). Dragging from anywhere on the card was tried and
+   is unreliable there, so only the dedicated grip icon (.task-drag-handle, see BoardColumn's
+   `filter` option) is a touch drag target - the rest of the card keeps completely normal
+   touch behaviour (scroll, tap), and mouse drag-from-anywhere on desktop is unaffected. */
+.task-drag-handle {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   touch-action: none;
+}
+
+.sortable-drag-handle {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* <img> has its own native "press-and-hold to save/drag" gesture on iOS Safari, separate from
+   the drag handle above - long-pressing a task's photo shouldn't pop up Safari's save-image menu. */
+.sortable-drag-handle img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
