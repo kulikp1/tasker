@@ -58,6 +58,10 @@ async function onAddItem(listId: string, title: string): Promise<void> {
   await shopping.addItem(listId, title);
   toast.success('Покупку додано');
 }
+async function onEditItem(listId: string, itemId: string, title: string): Promise<void> {
+  await shopping.editItem(listId, itemId, { title });
+  toast.success('Покупку змінено');
+}
 async function onRemoveItem(listId: string, itemId: string): Promise<void> {
   try {
     await shopping.removeItem(listId, itemId);
@@ -112,6 +116,7 @@ async function onRemove(id: string, title: string): Promise<void> {
         :list="list"
         :index="i"
         :add-item="(t) => onAddItem(list._id, t)"
+        :edit-item="(id, t) => onEditItem(list._id, id, t)"
         @toggle-item="(id, v) => onToggle(list._id, id, v)"
         @remove-item="(id) => onRemoveItem(list._id, id)"
         @archive="onArchive(list._id)"

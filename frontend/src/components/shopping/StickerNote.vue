@@ -8,7 +8,7 @@ import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
 import type { ShoppingList } from '@/api/types';
 
-const props = defineProps<{ list: ShoppingList; index: number; archived?: boolean; addItem?: (title: string) => Promise<void> }>();
+const props = defineProps<{ list: ShoppingList; index: number; archived?: boolean; addItem?: (title: string) => Promise<void>; editItem?: (itemId: string, title: string) => Promise<void> }>();
 const emit = defineEmits<{
   toggleItem: [itemId: string, value: boolean];
   removeItem: [itemId: string];
@@ -53,6 +53,27 @@ async function submitItem(): Promise<void> {
     toast.error(apiErrorMessage(err, 'Не вдалося додати покупку'));
   } finally {
     submitting.value = false;
+  }
+}
+
+const editingItemId = ref<string | null>(null);
+const editDraft = ref('');
+
+function startEditItem(itemId: string, title: string): void {
+  if (props.archived) return;
+  editingItemId.value = itemId;
+  editDraft.value = title;
+}
+
+async function saveEditItem(itemId: string, originalTitle: string): Promise<void> {
+  if (editingItemId.value !== itemId) return;
+  editingItemId.value = null;
+  const t = editDraft.value.trim();
+  if (!t || t === originalTitle || !props.editItem) return;
+  try {
+    await props.editItem(itemId, t);
+  } catch (err) {
+    toast.error(apiErrorMessage(err, 'Не вдалося змінити покупку'));
   }
 }
 </script>
@@ -100,7 +121,23 @@ async function submitItem(): Promise<void> {
         >
           <Check v-if="item.isPurchased" :size="12" :stroke-width="3" />
         </button>
-        <span class="min-w-0 flex-1 truncate font-display text-xl leading-tight" :class="item.isPurchased ? 'line-through opacity-45' : ''">{{ item.title }}</span>
+        <input
+          v-if="editingItemId === item._id"
+          v-model="editDraft"
+          type="text"
+          autofocus
+          class="min-w-0 flex-1 bg-transparent font-display text-xl leading-tight focus:outline-none"
+          :style="{ color: c.ink }"
+          @keyup.enter="($event.target as HTMLInputElement).blur()"
+          @keyup.esc="editingItemId = null"
+          @blur="saveEditItem(item._id, item.title)"
+        />
+        <span
+          v-else
+          class="min-w-0 flex-1 truncate font-display text-xl leading-tight"
+          :class="[item.isPurchased ? 'line-through opacity-45' : '', !archived ? 'cursor-text' : '']"
+          @click="startEditItem(item._id, item.title)"
+        >{{ item.title }}</span>
         <span v-if="item.quantity" class="shrink-0 font-mono text-[11px] opacity-55">×{{ item.quantity }}</span>
         <button type="button" class="touch-target shrink-0 opacity-0 transition-opacity hover:text-red-600 group-hover/item:opacity-60" @click="emit('removeItem', item._id)"><X :size="14" /></button>
       </li>
@@ -115,6 +152,7 @@ async function submitItem(): Promise<void> {
           class="min-w-0 flex-1 bg-transparent font-display text-xl leading-tight placeholder:opacity-40 focus:outline-none disabled:opacity-50"
           :style="{ color: c.ink }"
           @keyup.enter="submitItem"
+          @blur="submitItem"
         />
         <button type="button" class="touch-target flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-black/10 hover:bg-black/20 disabled:opacity-50" :disabled="submitting" @click="submitItem">
           <Spinner v-if="submitting" :size="14" />
