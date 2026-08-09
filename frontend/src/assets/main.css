@@ -95,19 +95,9 @@ textarea:focus-visible {
   transition: none !important;
 }
 
-/* iOS Safari has long-standing, still-open bugs around SortableJS's forceFallback touch path
-   when the whole card is the drag surface (native scroll/selection gestures win the race against
-   the JS-driven drag depending on iOS version). Dragging from anywhere on the card was tried and
-   is unreliable there, so only the dedicated grip icon (.task-drag-handle, see BoardColumn's
-   `filter` option) is a touch drag target - the rest of the card keeps completely normal
-   touch behaviour (scroll, tap), and mouse drag-from-anywhere on desktop is unaffected. */
-.task-drag-handle {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: none;
-}
-
+/* A brief hold-and-move on touch is otherwise indistinguishable from a long-press to select
+   text or open iOS's copy/look-up callout, so the browser would win the gesture instead of
+   Sortable - suppress both regardless of what starts the drag. */
 .sortable-drag-handle {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -115,11 +105,20 @@ textarea:focus-visible {
 }
 
 /* <img> has its own native "press-and-hold to save/drag" gesture on iOS Safari, separate from
-   the drag handle above - long-pressing a task's photo shouldn't pop up Safari's save-image menu. */
+   the above - long-pressing a task's photo shouldn't pop up Safari's save-image menu. */
 .sortable-drag-handle img {
   -webkit-user-drag: none;
   -webkit-touch-callout: none;
   user-select: none;
+}
+
+/* Viewer.js's own close button sits mostly off-screen by design (`top: -40px`), with only its
+   bottom-left sliver poking into view near the top-right corner. In a home-screen standalone app
+   there's no browser chrome pushing content down, so that sliver lands right under the status
+   bar/notch and becomes invisible/unclickable - nudge it down by the safe area to compensate.
+   viewer.css loads after this file, so this needs !important to actually win. */
+.viewer-button {
+  top: calc(-40px + env(safe-area-inset-top)) !important;
 }
 
 ::-webkit-scrollbar {

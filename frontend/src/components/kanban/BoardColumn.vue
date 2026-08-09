@@ -37,15 +37,6 @@ watch(
   { immediate: true }
 );
 
-// iOS Safari's forceFallback touch handling is flaky when the whole card is a drag surface,
-// so touch drags are restricted to the dedicated grip icon (.task-drag-handle); mouse users on
-// desktop keep dragging from anywhere on the card, since that path never had the problem.
-function dragFilter(evt: Event): boolean {
-  const isTouch = evt.type === 'touchstart' || (evt as PointerEvent).pointerType === 'touch';
-  if (!isTouch) return false;
-  return !(evt.target as HTMLElement).closest('.task-drag-handle');
-}
-
 function onDragStart(): void {
   dragging = true;
   board.dragging = true;
@@ -137,15 +128,6 @@ const countLabel = computed(() => `${taskCount.value} tasks`);
           animation="200"
           ghost-class="opacity-40"
           chosen-class="ring-2 ring-accent-400 shadow-xl"
-          :force-fallback="true"
-          :fallback-tolerance="5"
-          :delay="0"
-          :filter="dragFilter"
-          :prevent-on-filter="false"
-          :scroll="true"
-          :bubble-scroll="true"
-          :scroll-sensitivity="80"
-          :scroll-speed="15"
           class="flex min-h-full flex-col gap-3"
           @start="onDragStart"
           @end="onDragEnd"

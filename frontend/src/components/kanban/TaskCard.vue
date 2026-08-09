@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Square, ArrowRight, GripVertical } from 'lucide-vue-next';
+import { Square, ArrowRight } from 'lucide-vue-next';
 import Avatar from '@/components/common/Avatar.vue';
 import { usePeopleStore } from '@/stores/people';
 import { useRealtimeStore } from '@/stores/realtime';
@@ -34,15 +34,16 @@ const imageViewerOptions = {
   },
   // Viewer.js's own tap-outside-to-close only fires a synthetic click on touch after ~50ms
   // and only if a prior pointerdown established a drag "action" - flaky in practice, taps on
-  // the empty backdrop routinely get swallowed. Binding our own touchend on the canvas is a
-  // reliable, direct check: same element down and up, and nothing but the bare backdrop.
+  // the empty backdrop routinely get swallowed. `touchend.target` is always the element the
+  // touch started on (touches don't retarget), so this is a direct, reliable check - bound on
+  // both touchend and click since we can't be sure which fires on a given device/OS.
   shown(this: any) {
     const canvas: HTMLElement = this.canvas;
-    let downTarget: EventTarget | null = null;
-    canvas.addEventListener('touchstart', (e: TouchEvent) => { downTarget = e.target; }, { passive: true });
-    canvas.addEventListener('touchend', (e: TouchEvent) => {
-      if (downTarget === canvas && e.target === canvas) this.hide();
-    });
+    const closeIfBackdrop = (e: Event) => {
+      if (e.target === canvas) this.hide();
+    };
+    canvas.addEventListener('touchend', closeIfBackdrop);
+    canvas.addEventListener('click', closeIfBackdrop);
   },
 };
 
@@ -58,14 +59,13 @@ const deadlineLabel = computed(() => {
 </script>
 
 <template>
-  <div class="sortable-drag-handle group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-white/[0.05]">
+  <div
+    class="sortable-drag-handle group relative cursor-grab overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing dark:border-white/10 dark:bg-white/[0.05]"
+    @click="$emit('click')"
+  >
     <span v-if="task.tag" class="absolute inset-y-0 left-0 w-1" :style="{ backgroundColor: accent }" />
 
-    <div class="task-drag-handle absolute right-2 top-2 z-10 flex h-8 w-8 cursor-grab items-center justify-center rounded-full text-slate-300 active:cursor-grabbing dark:text-slate-600">
-      <GripVertical :size="16" />
-    </div>
-
-    <div class="p-4 pl-5 pr-10" @click="$emit('click')">
+    <div class="p-4 pl-5">
       <div
         v-if="task.imageUrl"
         v-viewer="imageViewerOptions"
