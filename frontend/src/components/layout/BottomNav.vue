@@ -15,12 +15,7 @@ const items = computed(() => [
 </script>
 
 <template>
-  <nav
-    class="fixed inset-x-0 z-30 flex items-center justify-around safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden"
-    style="bottom: var(--nav-bottom-offset, 0px); min-height: calc(3.5rem + env(safe-area-inset-bottom))"
-  >
-    <!-- TEMPORARY cache-verification marker - remove once we've confirmed fresh code is loading -->
-    <span class="pointer-events-none absolute -top-5 right-1 rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white">BUILD-NAV-FIX-v8</span>
+  <nav class="fixed inset-x-0 bottom-0 z-30 flex h-14 items-center justify-around safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden">
     <RouterLink
       v-for="item in items"
       :key="item.name"
