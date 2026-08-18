@@ -57,7 +57,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="relative flex h-svh items-center justify-center overflow-hidden safe-x px-4">
+  <div class="app-shell relative flex items-center justify-center overflow-hidden safe-x px-4">
     <div class="pointer-events-none absolute inset-0 bg-surface-light dark:bg-surface-dark" />
     <div
       class="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl"

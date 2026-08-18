@@ -21,6 +21,7 @@ body {
 
 body {
   @apply bg-surface-light text-slate-900 antialiased;
+  min-height: 100vh;
   min-height: 100svh;
 }
 
@@ -67,7 +68,34 @@ textarea:focus-visible {
 }
 
 #app {
+  min-height: 100vh;
   min-height: 100svh;
+}
+
+/* svh/dvh are meant to solve iOS Safari's old 100vh-taller-than-visible-viewport bug, but in a
+   home-screen standalone app (no browser chrome to begin with) they've been observed computing
+   shorter than the real screen instead - the app shell then falls short of the bottom edge,
+   leaving a gap of bare body background above the bottom nav. -webkit-fill-available is the
+   older, blunter fix for this exact class of bug and is what actually matches the real viewport
+   here, so it wins as the final override wherever WebKit supports it. */
+.app-shell {
+  height: 100vh;
+  height: 100svh;
+}
+@supports (height: -webkit-fill-available) {
+  .app-shell {
+    height: -webkit-fill-available;
+  }
+}
+
+.modal-max-h {
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100svh - 2rem);
+}
+@supports (height: -webkit-fill-available) {
+  .modal-max-h {
+    max-height: calc(-webkit-fill-available - 2rem);
+  }
 }
 
 .safe-top {

@@ -58,7 +58,7 @@ const sizeClass = {
       <div v-if="modelValue" class="fixed inset-0 flex items-center justify-center overflow-y-auto bg-slate-900/40 px-2 py-4 backdrop-blur-sm safe-x sm:p-6" :class="elevated ? 'z-[60]' : 'z-50'" @mousedown.self="close">
         <Transition appear enter-active-class="animate-pop-in">
           <div
-            class="my-auto flex max-h-[calc(100svh-2rem)] w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-white/10 dark:bg-[#15151d]"
+            class="modal-max-h my-auto flex w-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-white/10 dark:bg-[#15151d]"
             :class="sizeClass[size ?? 'md']"
             @mousedown.stop
           >

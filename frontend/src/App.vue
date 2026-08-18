@@ -52,7 +52,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex h-svh flex-col overflow-hidden">
+  <div class="app-shell flex flex-col overflow-hidden">
     <Header v-if="auth.isAuthenticated && route.name !== 'login'" />
     <main class="min-h-0 flex-1 overflow-y-auto pb-6">
       <RouterView />
