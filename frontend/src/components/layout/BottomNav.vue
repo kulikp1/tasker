@@ -13,10 +13,13 @@ const items = computed(() => [
   { name: 'shopping', to: '/shopping', label: 'Покупки', icon: ShoppingBasket },
 ]);
 
-// TEMPORARY diagnostic readout - the exact same layout has measured correctly (zero gap) in
-// three separate test engines/scenarios, so the remaining discrepancy must be something real
-// and specific to the actual phone that can't be reproduced remotely. This prints the raw
-// numbers so they can just be read off the screen and reported back instead of guessed at.
+// Measured on the real device: visualViewport.offsetTop reads NEGATIVE (e.g. -68px) when this
+// bug is active - iOS is painting the page 68px lower than where it tells `position: fixed`
+// elements "bottom: 0" is, so a fixed nav ends up floating 68px above the real visible bottom
+// edge. offsetTop is normally >= 0 (how far the visual viewport's top is scrolled down from the
+// layout viewport's top); a negative value here is exactly that discrepancy, and it turns out to
+// be the right amount to shift `bottom` by directly - so use it as-is (clamped to never push
+// the nav the *other* direction, off-screen, if offsetTop is ever legitimately positive).
 const navEl = ref<HTMLElement | null>(null);
 const debugInfo = ref('measuring...');
 onMounted(async () => {
@@ -26,9 +29,12 @@ onMounted(async () => {
   document.body.appendChild(probe);
 
   function measure() {
+    const vv = window.visualViewport;
+    if (vv) {
+      document.documentElement.style.setProperty('--nav-bottom-offset', Math.min(0, vv.offsetTop) + 'px');
+    }
     if (!navEl.value) return;
     const rect = navEl.value.getBoundingClientRect();
-    const vv = window.visualViewport;
     const safeBottom = getComputedStyle(probe).paddingBottom;
     debugInfo.value = [
       `innerH=${window.innerHeight}`,
@@ -43,7 +49,9 @@ onMounted(async () => {
   }
   measure();
   window.addEventListener('resize', measure);
+  window.addEventListener('scroll', measure, { passive: true });
   window.visualViewport?.addEventListener('resize', measure);
+  window.visualViewport?.addEventListener('scroll', measure);
 });
 </script>
 
@@ -53,8 +61,8 @@ onMounted(async () => {
   </div>
   <nav
     ref="navEl"
-    class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden"
-    style="min-height: calc(3.5rem + 10px); transform: translateZ(0); -webkit-transform: translate3d(0, 0, 0); backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform"
+    class="fixed inset-x-0 z-30 flex items-center justify-around safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden"
+    style="bottom: var(--nav-bottom-offset, 0px); min-height: calc(3.5rem + 10px)"
   >
     <RouterLink
       v-for="item in items"
