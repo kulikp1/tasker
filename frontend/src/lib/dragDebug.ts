@@ -19,6 +19,10 @@ function describe(target: EventTarget | null): string {
   return `${target.tagName.toLowerCase()}${cls ? '.' + cls : ''}`;
 }
 
+function isDebugUi(target: EventTarget | null): boolean {
+  return target instanceof HTMLElement && target.closest('[data-drag-debug-ui]') !== null;
+}
+
 let initialized = false;
 
 export function initDragDebug(): void {
@@ -26,13 +30,17 @@ export function initDragDebug(): void {
   initialized = true;
   window.addEventListener(
     'touchstart',
-    (e) => push(`touchstart target=${describe(e.target)} cancelable=${e.cancelable} touches=${e.touches.length}`),
+    (e) => {
+      if (isDebugUi(e.target)) return;
+      push(`touchstart target=${describe(e.target)} cancelable=${e.cancelable} touches=${e.touches.length}`);
+    },
     { passive: true, capture: true }
   );
   let lastMoveLog = 0;
   window.addEventListener(
     'touchmove',
     (e) => {
+      if (isDebugUi(e.target)) return;
       const now = Date.now();
       if (now - lastMoveLog < 150) return;
       lastMoveLog = now;
@@ -40,12 +48,30 @@ export function initDragDebug(): void {
     },
     { passive: true, capture: true }
   );
-  window.addEventListener('touchend', (e) => push(`touchend target=${describe(e.target)}`), { passive: true, capture: true });
-  window.addEventListener('touchcancel', (e) => push(`touchcancel target=${describe(e.target)}`), { passive: true, capture: true });
+  window.addEventListener(
+    'touchend',
+    (e) => {
+      if (isDebugUi(e.target)) return;
+      push(`touchend target=${describe(e.target)}`);
+    },
+    { passive: true, capture: true }
+  );
+  window.addEventListener(
+    'touchcancel',
+    (e) => {
+      if (isDebugUi(e.target)) return;
+      push(`touchcancel target=${describe(e.target)}`);
+    },
+    { passive: true, capture: true }
+  );
   window.addEventListener('error', (e) => push(`JS ERROR: ${e.message} @ ${e.filename}:${e.lineno}`));
   push('debug logger attached');
 }
 
 export function logDrag(msg: string): void {
   push(msg);
+}
+
+export function clearDragDebug(): void {
+  dragDebugLog.length = 0;
 }
