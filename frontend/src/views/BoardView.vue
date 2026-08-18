@@ -69,7 +69,7 @@ async function addColumn(): Promise<void> {
       </button>
     </div>
 
-    <div class="flex min-h-0 flex-1 gap-5 overflow-x-auto pb-6 sm:snap-none" :class="board.dragging ? '' : 'snap-x snap-mandatory'">
+    <div class="flex min-h-0 flex-1 gap-5 overflow-x-auto pb-6">
       <BoardColumn v-for="(col, i) in board.sortedColumns" :key="col._id" :column="col" :index="i" @task-click="openTask" @add-task="openNewTask" />
     </div>
 

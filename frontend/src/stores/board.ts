@@ -8,10 +8,6 @@ export const useBoardStore = defineStore('board', {
     columns: [] as Column[],
     tasks: [] as Task[],
     loaded: false,
-    // Toggled by BoardColumn while a card is being dragged, so BoardView can drop the
-    // horizontal scroll-snap - snap-mandatory otherwise fights Sortable's autoscroll,
-    // making it nearly impossible to drag a task into a column that's off-screen.
-    dragging: false,
   }),
   getters: {
     tasksByColumn: (state) => (columnId: string) =>

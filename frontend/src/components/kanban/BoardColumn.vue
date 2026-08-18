@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import draggable from 'vuedraggable';
 // @ts-expect-error - sortablejs has no bundled types and this is a temporary debug-only import
 import SortableJS from 'sortablejs';
@@ -24,21 +24,19 @@ const accent = computed(() => (props.column.isTerminal ? '#22c55e' : COLUMN_ACCE
 const editingTitle = ref(false);
 const titleDraft = ref(props.column.title);
 
-// vuedraggable owns this array directly (splices it in place as the user drags), so it
-// must be a real, stable ref - not a computed that hands back a freshly filtered/sorted
-// array on every read, which fights vuedraggable's own DOM/array bookkeeping mid-drag.
-// While a drag is in progress we stop pulling from the store so vuedraggable's own splice
-// isn't clobbered by an unrelated store update landing in the middle of the gesture.
-const localTasks = ref<Task[]>([]);
-let dragging = false;
-
-watch(
-  () => board.tasksByColumn(props.column._id),
-  (tasks) => {
-    if (!dragging) localTasks.value = tasks;
+// Mirrors the working reference project's pattern exactly: v-model is a plain computed
+// straight into the store (no local buffer ref, no "dragging" guard flag). vuedraggable
+// hands the setter a new array on drop; re-stamping order/columnId on the same task objects
+// mutates them in place, so the tasksByColumn getter naturally reflects the new order.
+const tasks = computed<Task[]>({
+  get: () => board.tasksByColumn(props.column._id),
+  set: (value) => {
+    value.forEach((t, index) => {
+      t.order = index;
+      t.columnId = props.column._id;
+    });
   },
-  { immediate: true }
-);
+});
 
 const dragRoot = ref<{ $el: HTMLElement } | null>(null);
 onMounted(async () => {
@@ -58,22 +56,17 @@ function onDragUnchoose(): void {
 
 function onDragStart(): void {
   logDrag(`sortable:start column=${props.column.title}`);
-  dragging = true;
-  board.dragging = true;
 }
 
 function onDragEnd(): void {
   logDrag('sortable:end');
-  dragging = false;
-  board.dragging = false;
-  localTasks.value = board.tasksByColumn(props.column._id);
 }
 
 async function onChange(evt: any): Promise<void> {
   logDrag('sortable:change');
   const changed = evt.added ?? evt.moved;
   if (!changed) return;
-  const orderedIds = localTasks.value.map((t) => t._id);
+  const orderedIds = tasks.value.map((t) => t._id);
   try {
     await board.moveTask(changed.element._id, props.column._id, orderedIds);
   } catch (err) {
@@ -112,8 +105,7 @@ async function removeColumn(): Promise<void> {
   }
 }
 
-const taskCount = computed(() => localTasks.value.length);
-const countLabel = computed(() => `${taskCount.value} tasks`);
+const countLabel = computed(() => `${tasks.value.length} tasks`);
 </script>
 
 <template>
@@ -142,27 +134,25 @@ const countLabel = computed(() => `${taskCount.value} tasks`);
         </template>
       </div>
 
-      <div class="relative min-h-0 flex-1 overflow-y-auto p-3">
-        <draggable
-          ref="dragRoot"
-          v-model="localTasks"
-          group="tasks"
-          item-key="_id"
-          animation="200"
-          ghost-class="opacity-40"
-          chosen-class="ring-2 ring-accent-400 shadow-xl"
-          class="flex min-h-full flex-col gap-3"
-          @choose="onDragChoose"
-          @unchoose="onDragUnchoose"
-          @start="onDragStart"
-          @end="onDragEnd"
-          @change="onChange"
-        >
-          <template #item="{ element }">
+      <draggable
+        ref="dragRoot"
+        v-model="tasks"
+        group="tasks"
+        item-key="_id"
+        ghost-class="opacity-40"
+        class="relative flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3"
+        @choose="onDragChoose"
+        @unchoose="onDragUnchoose"
+        @start="onDragStart"
+        @end="onDragEnd"
+        @change="onChange"
+      >
+        <template #item="{ element }">
+          <div>
             <TaskCard :task="element" @click="emit('task-click', element)" />
-          </template>
-        </draggable>
-      </div>
+          </div>
+        </template>
+      </draggable>
 
       <div class="relative shrink-0 p-3 pt-0">
         <button
