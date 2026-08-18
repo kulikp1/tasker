@@ -17,6 +17,26 @@
     <meta name="apple-mobile-web-app-title" content="Tasker" />
     <meta name="mobile-web-app-capable" content="yes" />
 
+    <script>
+      // vh/svh/dvh/-webkit-fill-available have all proven unreliable in this standalone
+      // home-screen app on real devices (each has computed shorter than the actual screen on
+      // at least one tested phone). window.innerHeight is the old, boring, universally-correct
+      // way to get the real viewport height, so the app shell is sized from that instead. Set
+      // inline and this early so there's no flash of the wrong (CSS-unit-based) height on load.
+      // Only re-measured on orientation change, not plain resize - the latter also fires when
+      // the on-screen keyboard opens on some Android browsers, and re-measuring there would
+      // shrink the shell under the keyboard instead of letting it overlay (see viewport meta).
+      (function () {
+        function setAppHeight() {
+          document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+        }
+        setAppHeight();
+        window.addEventListener('orientationchange', function () {
+          setTimeout(setAppHeight, 100);
+        });
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />

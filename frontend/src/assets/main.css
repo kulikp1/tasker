@@ -70,32 +70,23 @@ textarea:focus-visible {
 #app {
   min-height: 100vh;
   min-height: 100svh;
+  min-height: var(--app-height, 100svh);
 }
 
-/* svh/dvh are meant to solve iOS Safari's old 100vh-taller-than-visible-viewport bug, but in a
-   home-screen standalone app (no browser chrome to begin with) they've been observed computing
-   shorter than the real screen instead - the app shell then falls short of the bottom edge,
-   leaving a gap of bare body background above the bottom nav. -webkit-fill-available is the
-   older, blunter fix for this exact class of bug and is what actually matches the real viewport
-   here, so it wins as the final override wherever WebKit supports it. */
+/* vh/svh/-webkit-fill-available have all measured shorter than the real screen on at least one
+   tested device in standalone mode - --app-height (set from window.innerHeight, see index.html)
+   is what's actually reliable, so it wins as the final override. The CSS units stay as a
+   fallback for the brief instant before that inline script runs. */
 .app-shell {
   height: 100vh;
   height: 100svh;
-}
-@supports (height: -webkit-fill-available) {
-  .app-shell {
-    height: -webkit-fill-available;
-  }
+  height: var(--app-height, 100svh);
 }
 
 .modal-max-h {
   max-height: calc(100vh - 2rem);
   max-height: calc(100svh - 2rem);
-}
-@supports (height: -webkit-fill-available) {
-  .modal-max-h {
-    max-height: calc(-webkit-fill-available - 2rem);
-  }
+  max-height: calc(var(--app-height, 100svh) - 2rem);
 }
 
 .safe-top {
@@ -140,11 +131,6 @@ textarea:focus-visible {
   user-select: none;
 }
 
-/* Viewer.js's own close button sits mostly off-screen by design (`top: -40px`), with only its
-   bottom-left sliver poking into view near the top-right corner. In a home-screen standalone app
-   there's no browser chrome pushing content down, so that sliver lands right under the status
-   bar/notch and becomes invisible/unclickable - nudge it down by the safe area to compensate.
-   viewer.css loads after this file, so this needs !important to actually win. */
 .viewer-button {
   top: calc(-40px + env(safe-area-inset-top)) !important;
 }
