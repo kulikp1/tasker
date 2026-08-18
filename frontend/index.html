@@ -18,20 +18,31 @@
     <meta name="mobile-web-app-capable" content="yes" />
 
     <script>
-      // vh/svh/dvh/-webkit-fill-available have all proven unreliable in this standalone
-      // home-screen app on real devices (each has computed shorter than the actual screen on
-      // at least one tested phone). window.innerHeight is the old, boring, universally-correct
-      // way to get the real viewport height, so the app shell is sized from that instead. Set
-      // inline and this early so there's no flash of the wrong (CSS-unit-based) height on load.
-      // Only re-measured on orientation change, not plain resize - the latter also fires when
-      // the on-screen keyboard opens on some Android browsers, and re-measuring there would
-      // shrink the shell under the keyboard instead of letting it overlay (see viewport meta).
+      // vh/svh/dvh/-webkit-fill-available have all proven unreliable in this app on real
+      // devices (each has computed shorter than the actual screen on at least one tested
+      // phone, in both standalone and plain Safari-tab mode) - window.innerHeight is the old,
+      // boring, universally-correct way to get the real viewport height, so the app shell is
+      // sized from that instead.
+      //
+      // On load, Safari's own chrome (URL bar) is still fully expanded, so the very first
+      // window.innerHeight reading undershoots what's available once it later collapses (e.g.
+      // on scroll) - that's exactly the gap this was meant to fix in the first place. So this
+      // only ever grows the recorded height on 'resize', never shrinks it, which also means a
+      // keyboard opening (which shrinks innerHeight on some Android browsers) can't shrink the
+      // shell out from under itself. A real orientation change legitimately changes the
+      // geometry, so that resets the baseline and remeasures fresh.
       (function () {
+        var maxHeight = 0;
         function setAppHeight() {
-          document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+          if (window.innerHeight > maxHeight) {
+            maxHeight = window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', maxHeight + 'px');
+          }
         }
         setAppHeight();
+        window.addEventListener('resize', setAppHeight);
         window.addEventListener('orientationchange', function () {
+          maxHeight = 0;
           setTimeout(setAppHeight, 100);
         });
       })();
