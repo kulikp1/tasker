@@ -7,6 +7,7 @@ import { useBoardStore } from '@/stores/board';
 import { useConfirm } from '@/composables/useConfirm';
 import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
+import { logDrag } from '@/lib/dragDebug';
 import type { Column, Task } from '@/api/types';
 
 const props = defineProps<{ column: Column; index: number }>();
@@ -37,18 +38,29 @@ watch(
   { immediate: true }
 );
 
+function onDragChoose(): void {
+  logDrag(`sortable:choose column=${props.column.title}`);
+}
+
+function onDragUnchoose(): void {
+  logDrag('sortable:unchoose');
+}
+
 function onDragStart(): void {
+  logDrag(`sortable:start column=${props.column.title}`);
   dragging = true;
   board.dragging = true;
 }
 
 function onDragEnd(): void {
+  logDrag('sortable:end');
   dragging = false;
   board.dragging = false;
   localTasks.value = board.tasksByColumn(props.column._id);
 }
 
 async function onChange(evt: any): Promise<void> {
+  logDrag('sortable:change');
   const changed = evt.added ?? evt.moved;
   if (!changed) return;
   const orderedIds = localTasks.value.map((t) => t._id);
@@ -129,6 +141,8 @@ const countLabel = computed(() => `${taskCount.value} tasks`);
           ghost-class="opacity-40"
           chosen-class="ring-2 ring-accent-400 shadow-xl"
           class="flex min-h-full flex-col gap-3"
+          @choose="onDragChoose"
+          @unchoose="onDragUnchoose"
           @start="onDragStart"
           @end="onDragEnd"
           @change="onChange"

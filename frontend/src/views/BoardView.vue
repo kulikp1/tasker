@@ -4,11 +4,13 @@ import { Plus } from 'lucide-vue-next';
 import BoardColumn from '@/components/kanban/BoardColumn.vue';
 import TaskModal from '@/components/kanban/TaskModal.vue';
 import Modal from '@/components/common/Modal.vue';
+import DragDebugPanel from '@/components/kanban/DragDebugPanel.vue';
 import { useBoardStore } from '@/stores/board';
 import { usePeopleStore } from '@/stores/people';
 import { useRealtimeStore } from '@/stores/realtime';
 import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
+import { initDragDebug } from '@/lib/dragDebug';
 import type { Task } from '@/api/types';
 
 const board = useBoardStore();
@@ -24,6 +26,7 @@ const newColumnTitle = ref('');
 let unsubscribe: (() => void) | null = null;
 
 onMounted(async () => {
+  initDragDebug();
   await Promise.all([board.fetch(), people.fetch()]);
   unsubscribe = realtime.onBoardUpdated(() => board.fetch());
 });
@@ -86,5 +89,6 @@ async function addColumn(): Promise<void> {
     </Modal>
 
     <TaskModal v-model="taskModalOpen" :task="activeTask" :default-column-id="activeColumnId" />
+    <DragDebugPanel />
   </div>
 </template>
