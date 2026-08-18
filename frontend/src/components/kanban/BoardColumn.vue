@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import draggable from 'vuedraggable';
-// @ts-expect-error - sortablejs has no bundled types and this is a temporary debug-only import
-import SortableJS from 'sortablejs';
 import { Plus, Pencil, Trash2, Check, X, Flag } from 'lucide-vue-next';
 import TaskCard from './TaskCard.vue';
 import { useBoardStore } from '@/stores/board';
 import { useConfirm } from '@/composables/useConfirm';
 import { toast } from '@/lib/toast';
 import { apiErrorMessage } from '@/api/client';
-import { logDrag } from '@/lib/dragDebug';
 import type { Column, Task } from '@/api/types';
 
 const props = defineProps<{ column: Column; index: number }>();
@@ -38,32 +35,7 @@ const tasks = computed<Task[]>({
   },
 });
 
-const dragRoot = ref<{ $el: HTMLElement } | null>(null);
-onMounted(async () => {
-  await nextTick();
-  const el = dragRoot.value?.$el;
-  const attached = el ? Boolean(SortableJS.get(el)) : false;
-  logDrag(`column="${props.column.title}" mounted, sortableAttached=${attached}`);
-});
-
-function onDragChoose(): void {
-  logDrag(`sortable:choose column=${props.column.title}`);
-}
-
-function onDragUnchoose(): void {
-  logDrag('sortable:unchoose');
-}
-
-function onDragStart(): void {
-  logDrag(`sortable:start column=${props.column.title}`);
-}
-
-function onDragEnd(): void {
-  logDrag('sortable:end');
-}
-
 async function onChange(evt: any): Promise<void> {
-  logDrag('sortable:change');
   const changed = evt.added ?? evt.moved;
   if (!changed) return;
   const orderedIds = tasks.value.map((t) => t._id);
@@ -135,16 +107,11 @@ const countLabel = computed(() => `${tasks.value.length} tasks`);
       </div>
 
       <draggable
-        ref="dragRoot"
         v-model="tasks"
         group="tasks"
         item-key="_id"
         ghost-class="opacity-40"
         class="relative flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3"
-        @choose="onDragChoose"
-        @unchoose="onDragUnchoose"
-        @start="onDragStart"
-        @end="onDragEnd"
         @change="onChange"
       >
         <template #item="{ element }">
