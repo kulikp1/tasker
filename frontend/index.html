@@ -46,6 +46,31 @@
           setTimeout(setAppHeight, 100);
         });
       })();
+
+      // A `position: fixed; bottom: 0` element is positioned against the LAYOUT viewport, which
+      // on iOS Safari can end up shorter than the VISUAL viewport actually on screen (the two are
+      // meant to match, but this has been observed diverging here) - the fixed element then sits
+      // above the true bottom edge by the difference, which is exactly the gap under the bottom
+      // nav this is trying to close. visualViewport reports what's really drawn on screen, so
+      // measure the gap between it and window.innerHeight directly and shift the nav down to
+      // close it, instead of trusting bottom: 0 to already be correct.
+      (function () {
+        function updateNavOffset() {
+          if (!window.visualViewport) return;
+          var vv = window.visualViewport;
+          var visibleBottom = vv.height + vv.offsetTop;
+          // How much MORE is actually visible on screen than window.innerHeight (the layout
+          // viewport fixed positioning is anchored to) accounts for. Push the nav down into
+          // that extra space with a negative `bottom` - 0 (or clamped away) if there's none.
+          var extra = visibleBottom - window.innerHeight;
+          document.documentElement.style.setProperty('--nav-bottom-offset', -Math.max(0, extra) + 'px');
+        }
+        updateNavOffset();
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', updateNavOffset);
+          window.visualViewport.addEventListener('scroll', updateNavOffset);
+        }
+      })();
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
