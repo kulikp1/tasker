@@ -54,7 +54,7 @@ onMounted(async () => {
   <nav
     ref="navEl"
     class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around safe-x border-t border-slate-200/70 bg-white/95 dark:border-white/10 dark:bg-[#0f0f16]/95 sm:hidden"
-    style="min-height: calc(3.5rem + 10px)"
+    style="min-height: calc(3.5rem + 10px); transform: translateZ(0); -webkit-transform: translate3d(0, 0, 0); backface-visibility: hidden; -webkit-backface-visibility: hidden; will-change: transform"
   >
     <RouterLink
       v-for="item in items"
